@@ -1,39 +1,35 @@
-const axios = require('axios');
-
 exports.handler = async function(event, context) {
   // Add CORS headers
   const headers = {
     'Access-Control-Allow-Origin': '*',
     'Access-Control-Allow-Headers': 'Content-Type',
-    'Access-Control-Allow-Methods': 'POST, OPTIONS'
+    'Access-Control-Allow-Methods': 'POST, OPTIONS',
+    'Content-Type': 'application/json'
   };
   
   // Handle preflight OPTIONS request
   if (event.httpMethod === 'OPTIONS') {
-    return { statusCode: 200, headers, body: '' };
+    return {
+      statusCode: 200,
+      headers,
+      body: JSON.stringify({ message: 'CORS preflight response' })
+    };
   }
   
+  // Your normal function logic...
   try {
-    const body = JSON.parse(event.body);
-    
-    const response = await axios.post('https://api.openai.com/v1/chat/completions', body, {
-      headers: {
-        'Authorization': `Bearer ${process.env.OPENAI_API_KEY}`,
-        'Content-Type': 'application/json'
-      }
-    });
+    // Process the request...
     
     return {
       statusCode: 200,
       headers,
-      body: JSON.stringify(response.data)
+      body: JSON.stringify(responseData)
     };
   } catch (error) {
-    console.error('Error:', error);
     return {
       statusCode: 500,
       headers,
-      body: JSON.stringify({ error: 'Failed to call OpenAI API' })
+      body: JSON.stringify({ error: error.message })
     };
   }
 };
