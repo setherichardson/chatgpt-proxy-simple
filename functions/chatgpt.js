@@ -1,12 +1,5 @@
 const { OpenAI } = require("openai");
 
-const responseData = await openai.chat.completions.create({
-  model: body.model || "gpt-4", 
-  messages: body.messages,
-  temperature: body.temperature || 0.7,
-  max_tokens: body.max_tokens || 150,
-});
-
 exports.handler = async function(event, context) {
   // CORS headers
   const headers = {
@@ -16,14 +9,18 @@ exports.handler = async function(event, context) {
     'Content-Type': 'application/json'
   };
   
-  // Handle OPTIONS request (CORS preflight)
-  if (event.httpMethod === 'OPTIONS') {
-    return {
-      statusCode: 200,
-      headers,
-      body: JSON.stringify({ message: 'CORS preflight response' })
-    };
-  }
+  const response = await openai.chat.completions.create({
+    model: body.model || "gpt-4", 
+    messages: body.messages,
+    temperature: body.temperature || 0.7,
+    max_tokens: body.max_tokens || 150,
+  });
+
+  return {
+    statusCode: 200,
+    headers,
+    body: JSON.stringify(response)
+  };
   
   try {
     // Parse request body
